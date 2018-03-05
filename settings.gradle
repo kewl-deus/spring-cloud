@@ -1,0 +1,9 @@
+rootProject.name='spring-cloud'
+include 'service-registry'
+include 'config-service'
+include 'microservices-dashboard'
+include 'microservices-admin'
+include 'customer-service'
+include 'selfservices-gateway'
+include 'hystrix-dashboard'
+

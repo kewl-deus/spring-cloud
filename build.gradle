@@ -1,0 +1,10 @@
+allprojects {
+
+	repositories {
+		mavenCentral()
+	}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+}
