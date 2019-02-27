@@ -1,9 +1,6 @@
 package com.example.customerservice;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -15,14 +12,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.util.Collection;
 import java.util.stream.Stream;
 
 @EnableDiscoveryClient
@@ -53,13 +52,20 @@ public class CustomerServiceApplication {
 @RestController
 class GreetingRestController {
 
+    @Autowired
+    CustomerRepository customerRepository;
+
     @Value("${greeting.phrase}")
     private String greetingPhrase;
 
     @GetMapping("/greeting/{customerId}")
     public String greeting(@PathVariable("customerId") Long customerId){
-        System.out.println("Greeting " + customerId);
-        return greetingPhrase + " " + customerId;
+        try {
+            Customer customer = customerRepository.getOne(customerId);
+            return greetingPhrase + " " + customer.getFirstname() + " " + customer.getLastname();
+        } catch (EntityNotFoundException e) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        }
     }
 }
 
