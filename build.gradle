@@ -1,10 +1,31 @@
-allprojects {
+subprojects {
+    buildscript {
+        ext {
+            springBootVersion = '1.5.10.RELEASE'
+        }
+        repositories {
+            mavenCentral()
+        }
+        dependencies {
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        }
+    }
 
-	repositories {
-		mavenCentral()
-	}
+    apply plugin: 'java'
+    apply plugin: 'idea'
 
-apply plugin: 'java'
-apply plugin: 'idea'
+    group = 'com.example'
+    version = '0.0.1-SNAPSHOT'
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+    }
+
+
+    ext {
+        springCloudVersion = 'Edgware.SR2'
+    }
+
 
 }
