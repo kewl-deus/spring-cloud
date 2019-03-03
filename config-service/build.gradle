@@ -4,15 +4,24 @@ buildscript {
 	}
 	repositories {
 		mavenCentral()
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath('gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.21.0')
 	}
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'com.palantir.docker'
+apply plugin: 'com.palantir.docker-run'
+apply plugin: 'com.palantir.docker-compose'
+
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
@@ -21,7 +30,6 @@ sourceCompatibility = 1.8
 repositories {
 	mavenCentral()
 }
-
 
 ext {
 	springCloudVersion = 'Edgware.SR2'
@@ -36,4 +44,18 @@ dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
+}
+
+docker {
+	name "springcloud-sample/${project.name}"
+	copySpec.from("$buildDir/libs").include("*.jar").into("libs")
+	buildArgs(['JAR_FILE': "libs/${project.name}-${version}.jar"])
+}
+
+
+dockerRun {
+	name "springcloud-sample-${project.name}-container"
+	image "springcloud-sample/${project.name}"
+	ports '8888:8888'
+	daemonize true
 }
