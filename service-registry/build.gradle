@@ -31,6 +31,6 @@ docker {
 dockerRun {
 	name "springcloud-sample-${project.name}-container"
 	image "springcloud-sample/${project.name}"
-	ports '8888:8888'
+	ports '8761:8761'
 	daemonize true
 }
