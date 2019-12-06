@@ -1,4 +1,4 @@
 package com.example.customerservice.event;
 
-public class CustomerOnlineFlagUpdatedEvent {
+public class CustomerOnlineFlaggedEvent implements Event{
 }

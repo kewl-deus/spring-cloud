@@ -1,5 +1,6 @@
-package com.example.customerservice;
+package com.example.customerservice.controller;
 
+import com.example.customerservice.CustomerRepository;
 import com.example.customerservice.model.aggregate.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

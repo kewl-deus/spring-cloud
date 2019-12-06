@@ -1,48 +1,51 @@
 package com.example.customerservice.model.valueobject;
 
-import org.springframework.util.Assert;
-
 import java.util.Objects;
 
-public class Id {
+public class CustomerIdentifier {
 
     private final String key;
 
-    /** name of identity provider */
-    private final String issuer;
+    private final String type;
 
-    private Id(String key, String issuer) {
+
+    public static CustomerIdentifier from(String key, String type) {
+        return new CustomerIdentifier(key, type);
+    }
+
+    private CustomerIdentifier(String key, String type) {
         this.key = key;
-        this.issuer = issuer;
-    }
-
-    @Override
-    public String toString() {
-        return "Id{" +
-                "key='" + key + '\'' +
-                ", issuer='" + issuer + '\'' +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Id id = (Id) o;
-        return key.equals(id.key) &&
-                issuer.equals(id.issuer);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(key, issuer);
+        this.type = type;
     }
 
     public String getKey() {
         return key;
     }
 
-    public String getIssuer() {
-        return issuer;
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public String toString() {
+        return "CustomerIdentifier{" +
+                "key='" + key + '\'' +
+                ", type='" + type + '\'' +
+                '}';
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomerIdentifier customerIdentifier = (CustomerIdentifier) o;
+        return key.equals(customerIdentifier.key) &&
+                type.equals(customerIdentifier.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key, type);
     }
 }
