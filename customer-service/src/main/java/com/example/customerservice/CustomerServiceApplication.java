@@ -47,7 +47,7 @@ public class CustomerServiceApplication {
 
 
 @RepositoryRestResource
-interface CustomerRepository extends JpaRepository<Customer, Long>{
+public interface CustomerRepository extends JpaRepository<Customer, Long>{
     @RestResource(path = "by-fullname")
     Customer getByFirstnameAndLastname(@Param("firstname") String firstname, @Param("lastname") String lastname);
 }
