@@ -1,24 +1,35 @@
 package com.example.customerservice.command;
 
-import com.example.customerservice.backend.ContractBackend;
-import com.example.customerservice.event.CustomerRegistrationDataValidatedEvent;
-import com.example.customerservice.event.Event;
+import com.example.customerservice.event.CustomerRegistrationDataValidated;
+import com.example.customerservice.event.CustomerEvent;
+import com.example.customerservice.exception.InvalidRegistrationDataException;
 import com.example.customerservice.model.valueobject.ContractNumber;
 import com.example.customerservice.model.valueobject.CustomerIdentifier;
+import com.example.customerservice.model.valueobject.Name;
+import com.example.customerservice.model.valueobject.ZipCode;
+import com.example.customerservice.service.ContractService;
 
 import java.util.Date;
 
 public class RegisterCustomerCommand implements Command {
 
-    private ContractBackend contractBackend;
+    //services
+    private final ContractService contractService;
 
-    private String externalCustomerId;
-    private ContractNumber contractNumber;
-    private String lastname;
-    private Date birthDay;
-    private String zipCode;
+    //payload
+    private final CustomerIdentifier externalCustomerId;
+    private final ContractNumber contractNumber;
+    private final Name lastname;
+    private final Date birthDay;
+    private final ZipCode zipCode;
 
-    public RegisterCustomerCommand(String externalCustomerId, ContractNumber contractNumber, String lastname, Date birthDay, String zipCode) {
+
+    public RegisterCustomerCommand(ContractService contractService,
+                                   CustomerIdentifier externalCustomerId,
+                                   ContractNumber contractNumber,
+                                   Name lastname, Date birthDay,
+                                   ZipCode zipCode) {
+        this.contractService = contractService;
         this.externalCustomerId = externalCustomerId;
         this.contractNumber = contractNumber;
         this.lastname = lastname;
@@ -26,11 +37,13 @@ public class RegisterCustomerCommand implements Command {
         this.zipCode = zipCode;
     }
 
-
     @Override
-    public Event execute() {
+    public CustomerEvent execute() {
         //check backend if contract is valid
-        CustomerIdentifier contractHolderId = contractBackend.getContractHolder(contractNumber);
-        return new CustomerRegistrationDataValidatedEvent(CustomerIdentifier.from(externalCustomerId, "external"), contractHolderId);
+        CustomerIdentifier contractHolderId = contractService.getContractHolder(contractNumber);
+        if (contractHolderId == null){
+            throw new InvalidRegistrationDataException("Could not find holder for " + contractNumber);
+        }
+        return new CustomerRegistrationDataValidated(externalCustomerId, contractHolderId);
     }
 }

@@ -4,12 +4,12 @@ import com.example.customerservice.model.valueobject.CustomerIdentifier;
 
 import java.util.Objects;
 
-public class CustomerRegistrationDataValidatedEvent implements Event{
+public class CustomerRegistrationDataValidated implements CustomerEvent {
 
-    private CustomerIdentifier externalIdentifier;
-    private CustomerIdentifier internalIdentifier;
+    private final CustomerIdentifier externalIdentifier;
+    private final CustomerIdentifier internalIdentifier;
 
-    public CustomerRegistrationDataValidatedEvent(CustomerIdentifier externalIdentifier, CustomerIdentifier internalIdentifier) {
+    public CustomerRegistrationDataValidated(CustomerIdentifier externalIdentifier, CustomerIdentifier internalIdentifier) {
         this.externalIdentifier = externalIdentifier;
         this.internalIdentifier = internalIdentifier;
     }
@@ -34,7 +34,7 @@ public class CustomerRegistrationDataValidatedEvent implements Event{
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CustomerRegistrationDataValidatedEvent that = (CustomerRegistrationDataValidatedEvent) o;
+        CustomerRegistrationDataValidated that = (CustomerRegistrationDataValidated) o;
         return Objects.equals(externalIdentifier, that.externalIdentifier) &&
                 Objects.equals(internalIdentifier, that.internalIdentifier);
     }

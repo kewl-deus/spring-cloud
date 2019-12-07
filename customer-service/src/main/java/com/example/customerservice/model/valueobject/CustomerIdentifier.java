@@ -1,13 +1,14 @@
 package com.example.customerservice.model.valueobject;
 
+import javax.persistence.Embeddable;
 import java.util.Objects;
 
+@Embeddable
 public class CustomerIdentifier {
 
     private final String key;
 
     private final String type;
-
 
     public static CustomerIdentifier from(String key, String type) {
         return new CustomerIdentifier(key, type);

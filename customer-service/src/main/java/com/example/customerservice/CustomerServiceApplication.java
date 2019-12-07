@@ -1,17 +1,14 @@
 package com.example.customerservice;
 
 import com.example.customerservice.model.aggregate.Customer;
-import com.google.common.eventbus.EventBus;
+import com.example.customerservice.repository.CustomerRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Scope;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.data.rest.core.annotation.RestResource;
+import reactor.Environment;
+import reactor.bus.EventBus;
 
 import java.util.stream.Stream;
 
@@ -38,17 +35,17 @@ public class CustomerServiceApplication {
     }
 
     @Bean
-    public EventBus eventBus(){
-        return new EventBus();
+    Environment env() {
+        return Environment.initializeIfEmpty().assignErrorJournal();
+    }
+
+    @Bean
+    EventBus createEventBus(Environment env) {
+        return EventBus.create(env, Environment.THREAD_POOL);
     }
 
 }
 
 
 
-@RepositoryRestResource
-public interface CustomerRepository extends JpaRepository<Customer, Long>{
-    @RestResource(path = "by-fullname")
-    Customer getByFirstnameAndLastname(@Param("firstname") String firstname, @Param("lastname") String lastname);
-}
 

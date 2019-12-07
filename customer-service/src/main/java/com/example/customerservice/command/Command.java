@@ -1,8 +1,8 @@
 package com.example.customerservice.command;
 
-import com.example.customerservice.event.Event;
+import com.example.customerservice.event.CustomerEvent;
 
 public interface Command {
 
-    Event execute();
+    CustomerEvent execute();
 }

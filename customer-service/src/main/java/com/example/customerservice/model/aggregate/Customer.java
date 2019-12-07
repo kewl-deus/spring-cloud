@@ -1,5 +1,8 @@
 package com.example.customerservice.model.aggregate;
 
+import com.example.customerservice.model.valueobject.Address;
+
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -21,6 +24,9 @@ public class Customer {
     private String firstname;
 
     private String lastname;
+
+    @Embedded
+    private Address address;
 
     public Customer() {
     }

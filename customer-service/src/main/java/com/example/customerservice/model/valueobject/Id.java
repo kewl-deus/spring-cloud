@@ -1,32 +1,29 @@
 package com.example.customerservice.model.valueobject;
 
-import org.springframework.util.Assert;
-
 import javax.persistence.Embeddable;
 import java.util.Objects;
 
 @Embeddable
-public class Name {
+public class Id {
 
-    private final String value;
+    private final long value;
 
-    public static Name of(String value){
-        Assert.hasText(value, "Name cannot be empty");
-        return new Name(value);
+    public static Id from(long value){
+        return new Id(value);
     }
 
-    private Name(String value) {
+    private Id(long value) {
         this.value = value;
     }
 
-    public String getValue() {
+    public long getValue() {
         return value;
     }
 
     @Override
     public String toString() {
-        return "Name{" +
-                "value='" + value + '\'' +
+        return "Id{" +
+                "value=" + value +
                 '}';
     }
 
@@ -34,8 +31,8 @@ public class Name {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Name name = (Name) o;
-        return Objects.equals(value, name.value);
+        Id id = (Id) o;
+        return value == id.value;
     }
 
     @Override
