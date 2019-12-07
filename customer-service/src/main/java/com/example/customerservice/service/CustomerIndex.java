@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.bus.Event;
 import reactor.bus.EventBus;
+import reactor.bus.selector.Selectors;
 import reactor.fn.Consumer;
 
 import java.util.Set;
@@ -18,14 +19,18 @@ import java.util.stream.StreamSupport;
 @Service
 public class CustomerIndex implements Consumer<CustomerRegistrationDataValidated> {
 
-    @Autowired
     private CustomerIndexRepository repository;
 
-    @Autowired
     private EventBus eventBus;
 
-    public void register(CustomerIdentifier externalId, CustomerIdentifier internalId) {
-        repository.save(new CustomerIndexRecord(internalId, externalId));
+    public CustomerIndex(CustomerIndexRepository repository, EventBus eventBus) {
+        this.repository = repository;
+        this.eventBus = eventBus;
+        this.eventBus.on(Selectors.type(CustomerRegistrationDataValidated.class), this);
+    }
+
+    public CustomerIndexRecord register(CustomerIdentifier externalId, CustomerIdentifier internalId) {
+        return repository.save(new CustomerIndexRecord(internalId, externalId));
     }
 
     public Set<CustomerIdentifier> getRegistrations(CustomerIdentifier identifier) {
@@ -37,8 +42,8 @@ public class CustomerIndex implements Consumer<CustomerRegistrationDataValidated
 
     @Override
     public void accept(CustomerRegistrationDataValidated validatedEvent) {
-        register(validatedEvent.getExternalIdentifier(), validatedEvent.getInternalIdentifier());
-        CustomerRegistered registeredEvent = new CustomerRegistered();
-        eventBus.notify(CustomerRegistered.class.getSimpleName(), new Event<>(registeredEvent));
+        CustomerIndexRecord record = register(validatedEvent.getExternalIdentifier(), validatedEvent.getInternalIdentifier());
+        CustomerRegistered registeredEvent = new CustomerRegistered(record.getExternalIdentifier(), record.getInternalIdentifier());
+        eventBus.notify(CustomerRegistered.class, Event.wrap(registeredEvent));
     }
 }
