@@ -1,22 +1,28 @@
 package com.example.customerservice.model.valueobject;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.util.Objects;
 
 @Embeddable
 public class CustomerIdentifier {
 
-    private final String key;
+    @Column(nullable = false)
+    private String key;
 
-    private final String type;
+    @Column(nullable = false)
+    private String type;
 
     public static CustomerIdentifier from(String key, String type) {
         return new CustomerIdentifier(key, type);
     }
 
-    private CustomerIdentifier(String key, String type) {
+    public CustomerIdentifier(String key, String type) {
         this.key = key;
         this.type = type;
+    }
+
+    protected CustomerIdentifier() {
     }
 
     public String getKey() {

@@ -2,13 +2,17 @@ package com.example.customerservice.model.entity;
 
 import com.example.customerservice.model.valueobject.CustomerIdentifier;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.Table;
 
-@Entity
+@Entity()
+@Table(name = "customerindex")
 public class CustomerIndexRecord {
 
     @Id
@@ -16,9 +20,17 @@ public class CustomerIndexRecord {
     private Long id;
 
     @Embedded
+    @Column(nullable = false)
+    @AttributeOverrides({
+            @AttributeOverride(name = "key", column = @Column(name = "internal_key")),
+            @AttributeOverride(name = "type", column = @Column(name = "internal_type"))})
     private CustomerIdentifier internalIdentifier;
 
     @Embedded
+    @Column(nullable = false)
+    @AttributeOverrides({
+            @AttributeOverride(name = "key", column = @Column(name = "external_key")),
+            @AttributeOverride(name = "type", column = @Column(name = "external_type"))})
     private CustomerIdentifier externalIdentifier;
 
     public CustomerIndexRecord(CustomerIdentifier internalIdentifier, CustomerIdentifier externalIdentifier) {

@@ -18,6 +18,13 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-eureka')
 	compile('org.springframework.cloud:spring-cloud-starter-zipkin')
 
+	//necessary for java 9+
+	implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.2"
+	implementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
+
+	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+	implementation 'org.springframework.data:spring-data-rest-hal-browser'
+
 	//compile('io.projectreactor:reactor-core:2.0.8.RELEASE')
 	compile('io.projectreactor:reactor-bus:2.0.8.RELEASE')
 

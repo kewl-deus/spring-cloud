@@ -1,7 +1,7 @@
 package com.example.customerservice.controller;
 
-import com.example.customerservice.CustomerRepository;
 import com.example.customerservice.model.aggregate.Customer;
+import com.example.customerservice.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;

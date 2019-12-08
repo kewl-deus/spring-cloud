@@ -1,7 +1,9 @@
 package com.example.customerservice.model.aggregate;
 
 import com.example.customerservice.model.valueobject.Address;
+import org.springframework.hateoas.Identifiable;
 
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,7 +17,7 @@ import javax.persistence.Id;
 @Getter
 */
 @Entity
-public class Customer {
+public class Customer implements Identifiable<Long> {
 
     @Id
     @GeneratedValue
@@ -26,6 +28,7 @@ public class Customer {
     private String lastname;
 
     @Embedded
+    @Column(nullable = true)
     private Address address;
 
     public Customer() {

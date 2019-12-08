@@ -8,11 +8,11 @@ public class ContractNumber {
     private final String value;
 
     public static ContractNumber from(String value){
-        Assert.hasText(value, "Contract number cannot be null or empty");
         return new ContractNumber(value);
     }
 
     private ContractNumber(String value) {
+        Assert.hasText(value, "Contract number cannot be null or empty");
         this.value = value;
     }
 

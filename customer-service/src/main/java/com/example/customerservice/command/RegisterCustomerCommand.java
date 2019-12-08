@@ -9,7 +9,7 @@ import com.example.customerservice.model.valueobject.Name;
 import com.example.customerservice.model.valueobject.ZipCode;
 import com.example.customerservice.service.ContractService;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class RegisterCustomerCommand implements Command {
 
@@ -20,14 +20,14 @@ public class RegisterCustomerCommand implements Command {
     private final CustomerIdentifier externalCustomerId;
     private final ContractNumber contractNumber;
     private final Name lastname;
-    private final Date birthDay;
+    private final LocalDate birthDay;
     private final ZipCode zipCode;
 
 
     public RegisterCustomerCommand(ContractService contractService,
                                    CustomerIdentifier externalCustomerId,
                                    ContractNumber contractNumber,
-                                   Name lastname, Date birthDay,
+                                   Name lastname, LocalDate birthDay,
                                    ZipCode zipCode) {
         this.contractService = contractService;
         this.externalCustomerId = externalCustomerId;

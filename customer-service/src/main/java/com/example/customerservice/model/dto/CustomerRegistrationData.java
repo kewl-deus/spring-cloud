@@ -1,15 +1,15 @@
 package com.example.customerservice.model.dto;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class CustomerRegistrationData {
 
     private String contractNumber;
     private String lastname;
-    private Date birthDay;
+    private LocalDate birthDay;
     private String zipCode;
 
-    public CustomerRegistrationData(String contractNumber, String lastname, Date birthDay, String zipCode) {
+    public CustomerRegistrationData(String contractNumber, String lastname, LocalDate birthDay, String zipCode) {
         this.contractNumber = contractNumber;
         this.lastname = lastname;
         this.birthDay = birthDay;
@@ -24,7 +24,7 @@ public class CustomerRegistrationData {
         return lastname;
     }
 
-    public Date getBirthDay() {
+    public LocalDate getBirthDay() {
         return birthDay;
     }
 

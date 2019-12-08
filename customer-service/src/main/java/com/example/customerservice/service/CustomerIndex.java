@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
-public class CustomerIndex implements Consumer<CustomerRegistrationDataValidated> {
+public class CustomerIndex implements Consumer<Event<CustomerRegistrationDataValidated>> {
 
     private CustomerIndexRepository repository;
 
@@ -41,8 +41,9 @@ public class CustomerIndex implements Consumer<CustomerRegistrationDataValidated
     }
 
     @Override
-    public void accept(CustomerRegistrationDataValidated validatedEvent) {
-        CustomerIndexRecord record = register(validatedEvent.getExternalIdentifier(), validatedEvent.getInternalIdentifier());
+    public void accept(Event<CustomerRegistrationDataValidated> validatedEvent) {
+        CustomerRegistrationDataValidated payload = validatedEvent.getData();
+        CustomerIndexRecord record = register(payload.getExternalIdentifier(), payload.getInternalIdentifier());
         CustomerRegistered registeredEvent = new CustomerRegistered(record.getExternalIdentifier(), record.getInternalIdentifier());
         eventBus.notify(CustomerRegistered.class, Event.wrap(registeredEvent));
     }

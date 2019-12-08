@@ -11,11 +11,12 @@ public class Name {
     private final String value;
 
     public static Name of(String value){
-        Assert.hasText(value, "Name cannot be empty");
         return new Name(value);
     }
 
-    private Name(String value) {
+    private Name(String value)
+    {
+        Assert.hasText(value, "Name cannot be empty");
         this.value = value;
     }
 

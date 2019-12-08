@@ -11,12 +11,12 @@ public class ZipCode {
     private final String value;
 
     public static ZipCode of(String value){
-        Assert.hasLength(value, "ZipCode cannot be empty");
-        if (value.length() != 5) throw new IllegalArgumentException("ZipCode must have a length of 5");
         return new ZipCode(value);
     }
 
     private ZipCode(String value) {
+        Assert.hasLength(value, "ZipCode cannot be empty");
+        if (value.length() != 5) throw new IllegalArgumentException("ZipCode must have a length of 5");
         this.value = value;
     }
 
