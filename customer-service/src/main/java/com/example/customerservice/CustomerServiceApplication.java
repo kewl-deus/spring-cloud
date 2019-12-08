@@ -1,9 +1,7 @@
 package com.example.customerservice;
 
-import com.example.customerservice.event.CustomerRegistrationDataValidated;
 import com.example.customerservice.model.aggregate.Customer;
 import com.example.customerservice.repository.CustomerRepository;
-import com.example.customerservice.service.CustomerIndex;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,11 +9,8 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import reactor.Environment;
 import reactor.bus.EventBus;
-import reactor.bus.selector.Selectors;
 
 import java.util.stream.Stream;
-
-import static reactor.bus.selector.Selectors.$;
 
 @EnableDiscoveryClient
 @SpringBootApplication

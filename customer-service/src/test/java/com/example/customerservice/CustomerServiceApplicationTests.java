@@ -14,6 +14,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -28,7 +30,7 @@ public class CustomerServiceApplicationTests {
 	}
 
 	@Test
-	public void shouldSendEvents(){
+	public void shouldSendEvents() throws InterruptedException, ExecutionException, TimeoutException {
 		ResponseEntity responseEntity = registrationController.registerCustomer(CustomerIdentifier.from("123456", "extern"),
 				new CustomerRegistrationData("123456", "Mustermann", LocalDate.of(1980, Month.APRIL, 14), "50674"));
 

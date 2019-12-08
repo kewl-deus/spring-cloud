@@ -5,7 +5,6 @@ import com.example.customerservice.event.CustomerRegistrationDataValidated;
 import com.example.customerservice.model.entity.CustomerIndexRecord;
 import com.example.customerservice.model.valueobject.CustomerIdentifier;
 import com.example.customerservice.repository.CustomerIndexRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.bus.Event;
 import reactor.bus.EventBus;

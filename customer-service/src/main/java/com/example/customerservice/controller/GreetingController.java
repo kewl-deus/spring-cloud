@@ -17,14 +17,17 @@ import javax.persistence.EntityNotFoundException;
 @RestController
 class GreetingController {
 
-    @Autowired
-    CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
     @Value("${greeting.phrase}")
     private String greetingPhrase;
 
+    public GreetingController(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+
     @GetMapping("/greeting/{customerId}")
-    public String greeting(@PathVariable("customerId") Long customerId){
+    public String greeting(@PathVariable("customerId") Long customerId) {
         try {
             Customer customer = customerRepository.getOne(customerId);
             return greetingPhrase + " " + customer.getFirstname() + " " + customer.getLastname();

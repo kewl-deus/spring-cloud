@@ -30,7 +30,7 @@ ext {
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-starter-web')
-	compile('org.springframework.cloud:spring-cloud-starter-eureka')
+	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
 	compile('be.ordina:microservices-dashboard-server:1.0.1')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
