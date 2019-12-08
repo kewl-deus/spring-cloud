@@ -10,7 +10,7 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,8 +55,8 @@ class CustomerApiGatewayRestController {
 	@HystrixCommand(fallbackMethod = "getCustomerNamesFallback")
 	@GetMapping("/names")
 	public Collection<String> getCustomerNames(){
-		ParameterizedTypeReference<Resources<Customer>> customerPtr = new ParameterizedTypeReference<Resources<Customer>>() {};
-		ResponseEntity<Resources<Customer>> entity = this.restTemplate.exchange("http://customer-service/customers", HttpMethod.GET, null, customerPtr);
+		ParameterizedTypeReference<CollectionModel<Customer>> customerPtr = new ParameterizedTypeReference<CollectionModel<Customer>>() {};
+		ResponseEntity<CollectionModel<Customer>> entity = this.restTemplate.exchange("http://customer-service/customers", HttpMethod.GET, null, customerPtr);
 		return entity
 				.getBody()
 				.getContent()
