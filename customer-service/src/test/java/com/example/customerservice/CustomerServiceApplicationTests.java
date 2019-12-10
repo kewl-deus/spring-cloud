@@ -34,6 +34,7 @@ public class CustomerServiceApplicationTests {
 		ResponseEntity responseEntity = registrationController.registerExistingCustomer(CustomerIdentifier.from("123456", "extern"),
 				new CustomerRegistrationData(1L, "Mustermann", LocalDate.of(1980, Month.APRIL, 14), "50674"));
 
+		System.out.println(responseEntity);
 		Assert.assertEquals(201, responseEntity.getStatusCodeValue());
 	}
 

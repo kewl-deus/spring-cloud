@@ -16,7 +16,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-rest')
 	compile('org.springframework.boot:spring-boot-starter-hateoas')
 	compile('org.springframework.data:spring-data-rest-hal-browser')
-	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-webflux')
 	compile('org.springframework.cloud:spring-cloud-starter-config')
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
 	compile('org.springframework.cloud:spring-cloud-starter-zipkin')
@@ -27,12 +27,14 @@ dependencies {
 
 	implementation 'org.springframework.hateoas:spring-hateoas:1.0.2.RELEASE'
 
-	compile('io.projectreactor:reactor-core:2.0.8.RELEASE')
-	compile('io.projectreactor:reactor-bus:2.0.8.RELEASE')
+	//rxjava
+	implementation( "io.reactivex.rxjava2:rxjava:2.1.5")
 
 	runtime('com.h2database:h2')
 	compileOnly('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+
+
 }
 
 dependencyManagement {

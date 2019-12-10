@@ -1,14 +1,11 @@
 package com.example.customerservice.controller;
 
-import com.example.customerservice.command.CommandFactory;
-import com.example.customerservice.command.CommandGateway;
-import com.example.customerservice.command.RegisterCustomerCommand;
 import com.example.customerservice.event.CustomerRegistered;
-import com.example.customerservice.event.CustomerRegistrationRequested;
+import com.example.customerservice.event.ExistingCustomerRegistrationRequested;
+import com.example.customerservice.event.sourcing.EventBus;
 import com.example.customerservice.exception.CustomerNotFoundException;
 import com.example.customerservice.exception.InvalidRegistrationDataException;
 import com.example.customerservice.hateoas.CustomerRepresentationModelAssembler;
-import com.example.customerservice.model.aggregate.Customer;
 import com.example.customerservice.model.dto.CustomerRegistrationData;
 import com.example.customerservice.model.valueobject.CustomerIdentifier;
 import com.example.customerservice.model.valueobject.Id;
@@ -28,29 +25,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.bus.Event;
-import reactor.bus.EventBus;
-import reactor.bus.selector.Selectors;
-import reactor.fn.Consumer;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping(path = "/customers/registrations")
 public class RegistrationController {
-
-    @Autowired
-    private CommandGateway commandGateway;
-
-    @Autowired
-    private CommandFactory commandFactory;
 
     @Autowired
     private EventBus eventBus;
@@ -62,55 +49,37 @@ public class RegistrationController {
     private RegistrationService registrationService;
 
     @RequestMapping(method = RequestMethod.HEAD)
-    public ResponseEntity isRegistered(@RequestParam final String identifierKey, @RequestParam final String identifierType) {
+    public Mono<ResponseEntity> isRegistered(@RequestParam final String identifierKey, @RequestParam final String identifierType) {
         CustomerIdentifier customerIdentifier = CustomerIdentifier.from(identifierKey, identifierType);
         long registrationCount = registrationService.getRegistrations(customerIdentifier).count();
         if (registrationCount > 0) {
             //TODO can we add any HATEOAS links here?
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return Mono.just(ResponseEntity.status(HttpStatus.OK).build());
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    @PostMapping(consumes = {"application/vnd.registration.newcustomer+json;version=1"}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity registerNewCustomer() {
+    @PostMapping(consumes = {"application/vnd.registration.newcustomer+json;version=1"}, produces = {MediaType.APPLICATION_STREAM_JSON_VALUE})
+    public Mono<ResponseEntity> registerNewCustomer() {
         throw new UnsupportedOperationException();
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, "application/vnd.registration.existingcustomer+json;version=1"}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity registerExistingCustomer(@RequestHeader("idToken") final CustomerIdentifier externalCustomerIdentifier,
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, "application/vnd.registration.existingcustomer+json;version=1"}, produces = {MediaType.APPLICATION_STREAM_JSON_VALUE})
+    public Mono<ResponseEntity> registerExistingCustomer(@RequestHeader("idToken") final CustomerIdentifier externalCustomerIdentifier,
                                                    @RequestBody final CustomerRegistrationData registrationData) {
-        CustomerRegistrationRequested regRequestedEvent = new CustomerRegistrationRequested(
+        ExistingCustomerRegistrationRequested regRequestedEvent = new ExistingCustomerRegistrationRequested(
                 externalCustomerIdentifier,
-                Id.from(registrationData.getCustomerId()),
-                Name.of(registrationData.getLastname()), registrationData.getBirthDay(), ZipCode.of(registrationData.getZipCode()));
-
-        eventBus.notify(CustomerRegistrationRequested.class, new Event<>(regRequestedEvent));
-
-        RegisterCustomerCommand cmd = commandFactory.createRegisterCustomerCommand(externalCustomerIdentifier,
                 Id.from(registrationData.getCustomerId()),
                 Name.of(registrationData.getLastname()),
                 registrationData.getBirthDay(),
                 ZipCode.of(registrationData.getZipCode()));
 
-        commandGateway.send(cmd);
+        eventBus.send(regRequestedEvent);
+
+        eventBus.createObservable()
 
         //wait for registration event
 
-        final AtomicReference<CustomerRegistered> registeredEventHolder = new AtomicReference<>();
-        Consumer<Event<CustomerRegistered>> eventConsumer = event -> {
-            registeredEventHolder.set(event.getData());
-        };
-
-        eventBus.on(Selectors.type(CustomerRegistered.class), eventConsumer).cancelAfterUse();
-
-        CompletableFuture<CustomerRegistered> promise = CompletableFuture.supplyAsync(() -> {
-            CustomerRegistered event = null;
-            while (event == null) {
-                event = registeredEventHolder.get();
-            }
-            return event;
-        });
 
         try {
             CustomerRegistered customerRegisteredEvent = promise.get(1000, TimeUnit.MILLISECONDS);

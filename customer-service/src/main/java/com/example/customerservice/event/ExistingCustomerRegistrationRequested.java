@@ -7,7 +7,7 @@ import com.example.customerservice.model.valueobject.ZipCode;
 
 import java.time.LocalDate;
 
-public class CustomerRegistrationRequested implements DomainEvent {
+public class ExistingCustomerRegistrationRequested implements DomainEvent {
 
     private final CustomerIdentifier externalCustomerId;
     private final Id customerId;
@@ -15,11 +15,31 @@ public class CustomerRegistrationRequested implements DomainEvent {
     private final LocalDate birthDay;
     private final ZipCode zipCode;
 
-    public CustomerRegistrationRequested(CustomerIdentifier externalCustomerId, Id customerId, Name lastname, LocalDate birthDay, ZipCode zipCode) {
+    public ExistingCustomerRegistrationRequested(CustomerIdentifier externalCustomerId, Id customerId, Name lastname, LocalDate birthDay, ZipCode zipCode) {
         this.externalCustomerId = externalCustomerId;
         this.customerId = customerId;
         this.lastname = lastname;
         this.birthDay = birthDay;
         this.zipCode = zipCode;
+    }
+
+    public CustomerIdentifier getExternalCustomerId() {
+        return externalCustomerId;
+    }
+
+    public Id getCustomerId() {
+        return customerId;
+    }
+
+    public Name getLastname() {
+        return lastname;
+    }
+
+    public LocalDate getBirthDay() {
+        return birthDay;
+    }
+
+    public ZipCode getZipCode() {
+        return zipCode;
     }
 }

@@ -1,15 +1,16 @@
 package com.example.customerservice;
 
+import com.example.customerservice.event.sourcing.EventBus;
 import com.example.customerservice.model.aggregate.Customer;
 import com.example.customerservice.model.valueobject.Name;
 import com.example.customerservice.repository.CustomerRepository;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
-import reactor.Environment;
-import reactor.bus.EventBus;
+import org.springframework.context.annotation.Scope;
 
 import java.util.stream.Stream;
 
@@ -22,23 +23,10 @@ public class CustomerServiceApplication {
     }
 
     @Bean
-    Environment env() {
-        return Environment.initializeIfEmpty().assignErrorJournal();
+    @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
+    EventBus createEventBus() {
+        return new EventBus();
     }
-
-    @Bean
-    EventBus createEventBus(Environment env) {
-        return EventBus.create(env, Environment.THREAD_POOL);
-    }
-
-    /*
-    @Bean
-    public CommandLineRunner initEventBus(EventBus eventBus, CustomerIndex customerIndex){
-        return args -> {
-            eventBus.on($(CustomerRegistrationDataValidated.class.getSimpleName()), customerIndex);
-        };
-    }
-    */
 
 
     @Bean
