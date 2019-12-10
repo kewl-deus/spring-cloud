@@ -13,8 +13,8 @@ public class CustomerRepresentationModelAssembler implements RepresentationModel
 
     @Override
     public EntityModel<Customer> toModel(Customer customer) {
-        EntityModel<Customer> resource = new EntityModel<>(customer);
-        resource.add(linkTo(RegistrationController.class).withRel("registration"));
-        return resource;
+        EntityModel<Customer> representation = new EntityModel<>(customer);
+        representation.add(linkTo(RegistrationController.class).withRel("registrations"));
+        return representation;
     }
 }

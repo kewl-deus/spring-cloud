@@ -1,6 +1,7 @@
 package com.example.customerservice;
 
 import com.example.customerservice.model.aggregate.Customer;
+import com.example.customerservice.model.valueobject.Name;
 import com.example.customerservice.repository.CustomerRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -43,13 +44,14 @@ public class CustomerServiceApplication {
     @Bean
     public CommandLineRunner dummyDataGenerator(CustomerRepository customerRepository){
         return args -> {
-            String[] customers = "James Bond, Max Mustermann, Karl Müller, Ethan Hunt, Indiana Jones, Guybrush Threepwood".split(", ");
+            String[] customers = "Max Mustermann, James Bond, Karl Müller, Ethan Hunt, Indiana Jones, Guybrush Threepwood".split(", ");
             Stream.of(customers)
                     .map(s -> s.split(" "))
+                    .map(strings -> new Name[]{Name.of(strings[0]), Name.of(strings[1])})
                     .map(names -> new Customer(names[0], names[1]))
                     .forEach(c -> {
                         customerRepository.save(c);
-                        System.out.println("Saved " + c);
+                        System.out.println("Saved " + c.getId() + " --> " + c.getLastname());
                     });
         };
     }

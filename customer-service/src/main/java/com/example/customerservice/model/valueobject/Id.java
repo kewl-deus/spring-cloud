@@ -6,17 +6,18 @@ import java.util.Objects;
 @Embeddable
 public class Id {
 
-    private final long value;
+    private final Long value;
 
     public static Id from(long value){
         return new Id(value);
     }
 
-    private Id(long value) {
+    public Id(long value) {
+        if (value < 1) throw new IllegalArgumentException("Id cannot be smaller than 1");
         this.value = value;
     }
 
-    public long getValue() {
+    public Long getValue() {
         return value;
     }
 

@@ -1,12 +1,14 @@
 package com.example.customerservice.model.aggregate;
 
 import com.example.customerservice.model.valueobject.Address;
+import com.example.customerservice.model.valueobject.Name;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.time.LocalDate;
 
 
 /*
@@ -26,47 +28,38 @@ public class Customer {
 
     private String lastname;
 
+    @Column(nullable = true)
+    private LocalDate birthDay;
+
     @Embedded
     @Column(nullable = true)
     private Address address;
 
-    public Customer() {
+    protected Customer() {
     }
 
-    public Customer(String firstname, String lastname) {
-        this.firstname = firstname;
-        this.lastname = lastname;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public Customer(Name firstname, Name lastname){
+        this.firstname = firstname.getValue();
+        this.lastname = lastname.getValue();
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public String getFirstname() {
+        return firstname;
     }
 
-    @Override
-    public String toString() {
-        return "Customer{" +
-                "firstname='" + firstname + '\'' +
-                ", lastname='" + lastname + '\'' +
-                '}';
+    public String getLastname() {
+        return lastname;
+    }
+
+    public LocalDate getBirthDay() {
+        return birthDay;
+    }
+
+    public Address getAddress() {
+        return address;
     }
 }

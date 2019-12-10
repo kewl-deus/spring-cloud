@@ -31,8 +31,8 @@ public class CustomerServiceApplicationTests {
 
 	@Test
 	public void shouldSendEvents() throws InterruptedException, ExecutionException, TimeoutException {
-		ResponseEntity responseEntity = registrationController.registerCustomer(CustomerIdentifier.from("123456", "extern"),
-				new CustomerRegistrationData("123456", "Mustermann", LocalDate.of(1980, Month.APRIL, 14), "50674"));
+		ResponseEntity responseEntity = registrationController.registerExistingCustomer(CustomerIdentifier.from("123456", "extern"),
+				new CustomerRegistrationData(1L, "Mustermann", LocalDate.of(1980, Month.APRIL, 14), "50674"));
 
 		Assert.assertEquals(201, responseEntity.getStatusCodeValue());
 	}

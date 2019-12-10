@@ -2,7 +2,7 @@ package com.example.customerservice.event;
 
 import com.example.customerservice.model.valueobject.CustomerIdentifier;
 
-public class CustomerRegistrationDataValidated implements CustomerEvent {
+public class CustomerRegistrationDataValidated implements DomainEvent {
 
     private final CustomerIdentifier externalIdentifier;
     private final CustomerIdentifier internalIdentifier;

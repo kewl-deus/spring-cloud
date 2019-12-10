@@ -1,6 +1,6 @@
 package com.example.customerservice.command;
 
-import com.example.customerservice.event.CustomerEvent;
+import com.example.customerservice.event.DomainEvent;
 import org.springframework.stereotype.Component;
 import reactor.bus.Event;
 import reactor.bus.EventBus;
@@ -15,8 +15,8 @@ public class CommandGateway {
         this.eventBus = eventBus;
     }
 
-    public CustomerEvent send(Command cmd){
-        CustomerEvent event = cmd.execute();
+    public DomainEvent send(Command cmd){
+        DomainEvent event = cmd.execute();
         eventBus.notify(event.getClass(), new Event<>(event));
         return event;
     }
