@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -30,10 +31,11 @@ public class CustomerServiceApplicationTests {
 	}
 
 	@Test
-	public void shouldSendEvents() throws InterruptedException, ExecutionException, TimeoutException {
-		ResponseEntity responseEntity = registrationController.registerExistingCustomer(CustomerIdentifier.from("123456", "extern"),
+	public void shouldSendEvents() {
+		Mono<ResponseEntity> responseMono = registrationController.registerExistingCustomer(CustomerIdentifier.from("123456", "extern"),
 				new CustomerRegistrationData(1L, "Mustermann", LocalDate.of(1980, Month.APRIL, 14), "50674"));
 
+		ResponseEntity responseEntity = responseMono.block();
 		System.out.println(responseEntity);
 		Assert.assertEquals(201, responseEntity.getStatusCodeValue());
 	}

@@ -1,6 +1,7 @@
 package com.example.customerservice.event.sourcing;
 
 import com.example.customerservice.event.DomainEvent;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 
@@ -27,10 +28,11 @@ public class EventBus {
         eventSource.send(event);
     }
 
-    public void register(Class<? extends DomainEvent> eventType, Consumer<? extends DomainEvent> consumer) {
+    public <T extends DomainEvent> void register(Class<T> eventType, Consumer<T> consumer) {
         Disposable subscription = observable.subscribe(event -> {
             if (event != null && eventType.isAssignableFrom(event.getClass())) {
-                consumer.accept(event);
+                //we are sure event is of type T, so we can cast
+                consumer.accept((T) event);
             }
         });
         subscriptions.add(subscription);

@@ -22,8 +22,8 @@ public class CustomerServiceApplication {
         SpringApplication.run(CustomerServiceApplication.class, args);
     }
 
+    //@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     @Bean
-    @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     EventBus createEventBus() {
         return new EventBus();
     }

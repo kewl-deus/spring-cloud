@@ -12,6 +12,7 @@ import com.example.customerservice.model.valueobject.Id;
 import com.example.customerservice.model.valueobject.Name;
 import com.example.customerservice.model.valueobject.ZipCode;
 import com.example.customerservice.service.RegistrationService;
+import io.reactivex.BackpressureStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -25,12 +26,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -66,7 +65,7 @@ public class RegistrationController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, "application/vnd.registration.existingcustomer+json;version=1"}, produces = {MediaType.APPLICATION_STREAM_JSON_VALUE})
     public Mono<ResponseEntity> registerExistingCustomer(@RequestHeader("idToken") final CustomerIdentifier externalCustomerIdentifier,
-                                                   @RequestBody final CustomerRegistrationData registrationData) {
+                                                         @RequestBody final CustomerRegistrationData registrationData) {
         ExistingCustomerRegistrationRequested regRequestedEvent = new ExistingCustomerRegistrationRequested(
                 externalCustomerIdentifier,
                 Id.from(registrationData.getCustomerId()),
@@ -76,33 +75,34 @@ public class RegistrationController {
 
         eventBus.send(regRequestedEvent);
 
-        eventBus.createObservable()
+        return Mono
+                .from(eventBus.createObservable().toFlowable(BackpressureStrategy.BUFFER))
+                .filter(e -> e instanceof CustomerRegistered)
+                .map(e -> (CustomerRegistered) e)
+                .filter(e -> e.getExternalIdentifier().equals(externalCustomerIdentifier) && e.getInternalIdentifier().getKey().equals(registrationData.getCustomerId().toString()))
+                .map(this::createResponse);
 
         //wait for registration event
+        //TODO how to return HEAD request in HATEOAS?
+        //TODO do we need another method getRegistrationStatus() that queries events in order to show job progress?
+        /*
+        Link registrationStatusLink = new Link("/customers/registrations?identifierKey="
+                + externalCustomerIdentifier.getKey() + "&identifierType=" + externalCustomerIdentifier.getType(), "registrations");
+        return ResponseEntity.status(HttpStatus.ACCEPTED).location(URI.create(registrationStatusLink.getHref())).build();
+         */
+    }
 
-
+    private ResponseEntity createResponse(CustomerRegistered customerRegisteredEvent){
+        String externalId = customerRegisteredEvent.getExternalIdentifier().getKey();
+        Link customerLink;
         try {
-            CustomerRegistered customerRegisteredEvent = promise.get(1000, TimeUnit.MILLISECONDS);
-
-            String externalId = customerRegisteredEvent.getExternalIdentifier().getKey();
-            Link customerLink;
-            try {
-                customerLink = linkTo(CustomerController.class, externalId).withRel("customer");
-                //Link customerLink = linkTo(methodOn(CustomerController.class, "id").getCustomer("id")).withRel("customer");
-            } catch (Throwable ex) {
-                customerLink = new Link("/customers/" + externalId, "customer");
-            }
-
-            return ResponseEntity.status(HttpStatus.CREATED).location(URI.create(customerLink.getHref())).build();
-
-
-        } catch (TimeoutException | InterruptedException | ExecutionException e) {
-            //TODO how to return HEAD request in HATEOAS?
-            //TODO do we need another method getRegistrationStatus() that queries events in order to show job progress?
-            Link registrationStatusLink = new Link("/customers/registrations?identifierKey="
-                    + externalCustomerIdentifier.getKey() + "&identifierType=" + externalCustomerIdentifier.getType(), "registrations");
-            return ResponseEntity.status(HttpStatus.ACCEPTED).location(URI.create(registrationStatusLink.getHref())).build();
+            customerLink = linkTo(CustomerController.class, externalId).withRel("customer");
+            //Link customerLink = linkTo(methodOn(CustomerController.class, "id").getCustomer("id")).withRel("customer");
+        } catch (Throwable ex) {
+            customerLink = new Link("/customers/" + externalId, "customer");
         }
+
+        return ResponseEntity.status(HttpStatus.CREATED).location(URI.create(customerLink.getHref())).build();
     }
 
     @ExceptionHandler({InvalidRegistrationDataException.class})
