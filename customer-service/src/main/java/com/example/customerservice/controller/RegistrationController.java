@@ -13,6 +13,7 @@ import com.example.customerservice.model.valueobject.Name;
 import com.example.customerservice.model.valueobject.ZipCode;
 import com.example.customerservice.service.RegistrationService;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Observable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -75,12 +76,13 @@ public class RegistrationController {
 
         eventBus.send(regRequestedEvent);
 
-        return Mono
-                .from(eventBus.createObservable().toFlowable(BackpressureStrategy.BUFFER))
+        Observable<ResponseEntity> observable = eventBus.createObservable()
                 .filter(e -> e instanceof CustomerRegistered)
                 .map(e -> (CustomerRegistered) e)
                 .filter(e -> e.getExternalIdentifier().equals(externalCustomerIdentifier) && e.getInternalIdentifier().getKey().equals(registrationData.getCustomerId().toString()))
                 .map(this::createResponse);
+
+        return Mono.from(observable.toFlowable(BackpressureStrategy.BUFFER));
 
         //wait for registration event
         //TODO how to return HEAD request in HATEOAS?

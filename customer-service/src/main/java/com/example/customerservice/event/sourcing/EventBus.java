@@ -17,7 +17,7 @@ public class EventBus {
     public EventBus() {
         eventSource = new EventSource();
         observable = Observable.create(eventSource);
-        LinkedList<Disposable> subscriptions = new LinkedList<>();
+        subscriptions = new LinkedList<>();
     }
 
     public Observable<DomainEvent> createObservable() {

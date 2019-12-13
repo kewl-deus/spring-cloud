@@ -29,7 +29,7 @@ public class ExistingCustomerRegistrationRequestedHandler implements Consumer<Ex
     public void accept(final ExistingCustomerRegistrationRequested event) {
         Id customerId = event.getCustomerId();
 
-        if (customerService.isExistingCustomer(customerId)){
+        if (! customerService.isExistingCustomer(customerId)){
             throw new InvalidRegistrationDataException("Customer does not exist", new CustomerNotFoundException(customerId.toString()));
         }
         RegistrationDataValidated outEvent = new RegistrationDataValidated(event.getExternalCustomerId(), new CustomerIdentifier(customerId.getValue().toString(), "internal"));

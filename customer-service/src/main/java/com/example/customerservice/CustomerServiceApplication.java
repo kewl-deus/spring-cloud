@@ -5,11 +5,13 @@ import com.example.customerservice.model.aggregate.Customer;
 import com.example.customerservice.model.valueobject.Name;
 import com.example.customerservice.repository.CustomerRepository;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 
 import java.util.stream.Stream;
@@ -22,7 +24,8 @@ public class CustomerServiceApplication {
         SpringApplication.run(CustomerServiceApplication.class, args);
     }
 
-    //@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
+    @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
+    @Lazy(false)
     @Bean
     EventBus createEventBus() {
         return new EventBus();
@@ -30,7 +33,7 @@ public class CustomerServiceApplication {
 
 
     @Bean
-    public CommandLineRunner dummyDataGenerator(CustomerRepository customerRepository){
+    public ApplicationRunner dummyDataGenerator(CustomerRepository customerRepository){
         return args -> {
             String[] customers = "Max Mustermann, James Bond, Karl Müller, Ethan Hunt, Indiana Jones, Guybrush Threepwood".split(", ");
             Stream.of(customers)
