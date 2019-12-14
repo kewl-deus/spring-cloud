@@ -2,6 +2,12 @@ package com.example.customerservice.model.aggregate;
 
 import com.example.customerservice.model.valueobject.Address;
 import com.example.customerservice.model.valueobject.Name;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -11,12 +17,10 @@ import javax.persistence.Id;
 import java.time.LocalDate;
 
 
-/*
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @ToString
 @Getter
-*/
 @Entity
 public class Customer {
 
@@ -24,8 +28,10 @@ public class Customer {
     @GeneratedValue
     private Long id;
 
+    @NonNull
     private String firstname;
 
+    @NonNull
     private String lastname;
 
     @Column(nullable = true)
@@ -33,33 +39,11 @@ public class Customer {
 
     @Embedded
     @Column(nullable = true)
+    @NonNull
     private Address address;
 
-    protected Customer() {
-    }
-
-    public Customer(Name firstname, Name lastname){
+    public Customer(Name firstname, Name lastname) {
         this.firstname = firstname.getValue();
         this.lastname = lastname.getValue();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public LocalDate getBirthDay() {
-        return birthDay;
-    }
-
-    public Address getAddress() {
-        return address;
     }
 }

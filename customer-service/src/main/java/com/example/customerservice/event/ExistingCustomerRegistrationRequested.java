@@ -4,9 +4,15 @@ import com.example.customerservice.model.valueobject.CustomerIdentifier;
 import com.example.customerservice.model.valueobject.Id;
 import com.example.customerservice.model.valueobject.Name;
 import com.example.customerservice.model.valueobject.ZipCode;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 
+@ToString
+@Getter
+@AllArgsConstructor
 public class ExistingCustomerRegistrationRequested implements DomainEvent {
 
     private final CustomerIdentifier externalCustomerId;
@@ -15,31 +21,4 @@ public class ExistingCustomerRegistrationRequested implements DomainEvent {
     private final LocalDate birthDay;
     private final ZipCode zipCode;
 
-    public ExistingCustomerRegistrationRequested(CustomerIdentifier externalCustomerId, Id customerId, Name lastname, LocalDate birthDay, ZipCode zipCode) {
-        this.externalCustomerId = externalCustomerId;
-        this.customerId = customerId;
-        this.lastname = lastname;
-        this.birthDay = birthDay;
-        this.zipCode = zipCode;
-    }
-
-    public CustomerIdentifier getExternalCustomerId() {
-        return externalCustomerId;
-    }
-
-    public Id getCustomerId() {
-        return customerId;
-    }
-
-    public Name getLastname() {
-        return lastname;
-    }
-
-    public LocalDate getBirthDay() {
-        return birthDay;
-    }
-
-    public ZipCode getZipCode() {
-        return zipCode;
-    }
 }

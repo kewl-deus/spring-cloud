@@ -16,10 +16,6 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    public void customerExists(){
-
-    }
-
     public boolean isExistingCustomer(final Id customerId) {
         Optional<Customer> optionalCustomer = customerRepository.findById(customerId.getValue());
         return optionalCustomer.isPresent();

@@ -13,7 +13,8 @@ import com.example.customerservice.model.valueobject.Name;
 import com.example.customerservice.model.valueobject.ZipCode;
 import com.example.customerservice.service.RegistrationService;
 import io.reactivex.BackpressureStrategy;
-import io.reactivex.Observable;
+import io.reactivex.Maybe;
+import io.reactivex.observables.ConnectableObservable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -66,7 +68,7 @@ public class RegistrationController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, "application/vnd.registration.existingcustomer+json;version=1"}, produces = {MediaType.APPLICATION_STREAM_JSON_VALUE})
     public Mono<ResponseEntity> registerExistingCustomer(@RequestHeader("idToken") final CustomerIdentifier externalCustomerIdentifier,
-                                                         @RequestBody final CustomerRegistrationData registrationData) {
+                                                          @RequestBody final CustomerRegistrationData registrationData) {
         ExistingCustomerRegistrationRequested regRequestedEvent = new ExistingCustomerRegistrationRequested(
                 externalCustomerIdentifier,
                 Id.from(registrationData.getCustomerId()),
@@ -74,15 +76,18 @@ public class RegistrationController {
                 registrationData.getBirthDay(),
                 ZipCode.of(registrationData.getZipCode()));
 
+        ConnectableObservable<ResponseEntity> observable = eventBus.createObservable()
+                .ofType(CustomerRegistered.class)
+                .filter(e -> e.getExternalIdentifier().equals(externalCustomerIdentifier)
+                        && e.getInternalIdentifier().getKey().equals(registrationData.getCustomerId().toString()))
+                .map(this::createResponse)
+                .replay(1);
+
+        observable.connect();
+
         eventBus.send(regRequestedEvent);
 
-        Observable<ResponseEntity> observable = eventBus.createObservable()
-                .filter(e -> e instanceof CustomerRegistered)
-                .map(e -> (CustomerRegistered) e)
-                .filter(e -> e.getExternalIdentifier().equals(externalCustomerIdentifier) && e.getInternalIdentifier().getKey().equals(registrationData.getCustomerId().toString()))
-                .map(this::createResponse);
-
-        return Mono.from(observable.toFlowable(BackpressureStrategy.BUFFER));
+        return Mono.fromDirect(observable.toFlowable(BackpressureStrategy.BUFFER));
 
         //wait for registration event
         //TODO how to return HEAD request in HATEOAS?
@@ -101,7 +106,7 @@ public class RegistrationController {
             customerLink = linkTo(CustomerController.class, externalId).withRel("customer");
             //Link customerLink = linkTo(methodOn(CustomerController.class, "id").getCustomer("id")).withRel("customer");
         } catch (Throwable ex) {
-            customerLink = new Link("/customers/" + externalId, "customer");
+            customerLink = new Link("customers/" + externalId, "customer");
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).location(URI.create(customerLink.getHref())).build();
