@@ -1,35 +1,40 @@
 package com.example.customerservice;
 
 import com.example.customerservice.controller.RegistrationController;
+import com.example.customerservice.model.aggregate.Customer;
 import com.example.customerservice.model.dto.CustomerRegistrationData;
 import com.example.customerservice.model.valueobject.CustomerIdentifier;
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-import org.junit.Assert;
+import com.example.customerservice.model.valueobject.Name;
+import com.example.customerservice.repository.CustomerRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import reactor.core.publisher.Flux;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import static org.assertj.core.api.Assertions.*;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
-@TestPropertySource(locations = "classpath:application-controller-tests.properties")
+@TestPropertySource(locations = "classpath:application-controller-tests.yml")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CustomerServiceApplicationTests {
 
     @Autowired
     RegistrationController registrationController;
+
+    @Autowired
+    CustomerRepository customerRepository;
+
+    @Autowired
+    WebTestClient webTestClient;
 
     //@Test
     public void contextLoads() {
@@ -44,8 +49,24 @@ public class CustomerServiceApplicationTests {
         System.out.println("*******************************************");
         System.out.println(responseEntity);
         System.out.println("*******************************************");
-        Assert.assertEquals(201, responseEntity.getStatusCodeValue());
+        assertThat(responseEntity.getStatusCodeValue()).isEqualTo(201);
 
     }
 
+    @Test
+    public void shouldRegisterExistingUser() {
+        Customer existingCustomer = customerRepository.save(new Customer(Name.of("Hulk"), Name.of("Hogan")));
+        assertThat(existingCustomer.getId()).isPositive();
+
+        webTestClient.post()
+                .uri("/customers/registrations")
+                .header("idToken", "5d438c12-343b-49f2-810d-98d2515fe7be")
+                .contentType(new MediaType("application/vnd.registration.existingcustomer+json;version=1"))
+                .bodyValue(new CustomerRegistrationData(existingCustomer.getId(), existingCustomer.getLastname(), LocalDate.of(1966, Month.JUNE, 6), "50674"))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().exists("Location");
+    }
+
 }
+

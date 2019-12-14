@@ -23,7 +23,7 @@ public class EventSource implements ObservableOnSubscribe<DomainEvent> {
 
     public void send(DomainEvent event) {
         this.eventQueue.add(event);
-        logger.info("Sending event {} to {} subscribers", event, emitters.size());
+        logger.debug("Sending event {} to {} subscribers", event, emitters.size());
         for (ObservableEmitter<DomainEvent> emitter : emitters) {
             try {
                 if (! emitter.isDisposed()) {
@@ -37,6 +37,6 @@ public class EventSource implements ObservableOnSubscribe<DomainEvent> {
     @Override
     public void subscribe(ObservableEmitter<DomainEvent> emitter) {
         this.emitters.add(emitter);
-        logger.info("Added emitter, subscriber count is now {}", emitters.size());
+        logger.debug("Added emitter, subscriber count is now {}", emitters.size());
     }
 }

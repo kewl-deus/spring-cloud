@@ -13,7 +13,6 @@ import com.example.customerservice.model.valueobject.Name;
 import com.example.customerservice.model.valueobject.ZipCode;
 import com.example.customerservice.service.RegistrationService;
 import io.reactivex.BackpressureStrategy;
-import io.reactivex.Maybe;
 import io.reactivex.observables.ConnectableObservable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
@@ -28,10 +27,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -66,8 +68,8 @@ public class RegistrationController {
         throw new UnsupportedOperationException();
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, "application/vnd.registration.existingcustomer+json;version=1"}, produces = {MediaType.APPLICATION_STREAM_JSON_VALUE})
-    public Mono<ResponseEntity> registerExistingCustomer(@RequestHeader("idToken") final CustomerIdentifier externalCustomerIdentifier,
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, "application/vnd.registration.existingcustomer+json;version=1"})
+    public Mono<ResponseEntity> registerExistingCustomer(@RequestHeader(value = "idToken") final CustomerIdentifier externalCustomerIdentifier,
                                                           @RequestBody final CustomerRegistrationData registrationData) {
         ExistingCustomerRegistrationRequested regRequestedEvent = new ExistingCustomerRegistrationRequested(
                 externalCustomerIdentifier,
@@ -109,7 +111,8 @@ public class RegistrationController {
             customerLink = new Link("customers/" + externalId, "customer");
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).location(URI.create(customerLink.getHref())).build();
+        URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path(customerLink.getHref()).build(Collections.emptyMap());
+        return ResponseEntity.status(HttpStatus.CREATED).location(uri).build();
     }
 
     @ExceptionHandler({InvalidRegistrationDataException.class})

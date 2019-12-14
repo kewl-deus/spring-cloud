@@ -12,7 +12,7 @@ import javax.persistence.Embeddable;
 import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 @Getter
 @EqualsAndHashCode
@@ -27,5 +27,13 @@ public class CustomerIdentifier {
 
     public static CustomerIdentifier from(String key, String type) {
         return new CustomerIdentifier(key, type);
+    }
+
+    public static CustomerIdentifier from(String key, IdentitfierType type) {
+        return new CustomerIdentifier(key, type.name());
+    }
+
+    public boolean isOf(IdentitfierType type){
+        return type.name().equals(this.getType());
     }
 }

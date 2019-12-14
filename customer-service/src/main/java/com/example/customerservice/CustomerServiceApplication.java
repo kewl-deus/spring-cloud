@@ -13,6 +13,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
+import reactor.tools.agent.ReactorDebugAgent;
 
 import java.util.stream.Stream;
 
@@ -31,6 +32,13 @@ public class CustomerServiceApplication {
         return new EventBus();
     }
 
+    @Bean
+    public ApplicationRunner configureReactorDebugging(){
+        return args -> {
+            //Hooks.onOperatorDebug()
+            ReactorDebugAgent.init();
+        };
+    }
 
     @Bean
     public ApplicationRunner dummyDataGenerator(CustomerRepository customerRepository){

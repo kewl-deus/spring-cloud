@@ -7,6 +7,7 @@ import com.example.customerservice.exception.CustomerNotFoundException;
 import com.example.customerservice.exception.InvalidRegistrationDataException;
 import com.example.customerservice.model.valueobject.CustomerIdentifier;
 import com.example.customerservice.model.valueobject.Id;
+import com.example.customerservice.model.valueobject.IdentitfierType;
 import com.example.customerservice.service.CustomerService;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,7 @@ public class ExistingCustomerRegistrationRequestedHandler implements Consumer<Ex
         if (! customerService.isExistingCustomer(customerId)){
             throw new InvalidRegistrationDataException("Customer does not exist", new CustomerNotFoundException(customerId.toString()));
         }
-        RegistrationDataValidated outEvent = new RegistrationDataValidated(event.getExternalCustomerId(), new CustomerIdentifier(customerId.getValue().toString(), "internal"));
+        RegistrationDataValidated outEvent = new RegistrationDataValidated(event.getExternalCustomerId(), CustomerIdentifier.from(customerId.getValue().toString(), IdentitfierType.internal));
         eventBus.send(outEvent);
     }
 }
