@@ -21,9 +21,10 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Collections;
 
 @RunWith(SpringRunner.class)
-@TestPropertySource(locations = "classpath:application-controller-tests.yml")
+@TestPropertySource(locations = "classpath:application-controller-tests.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CustomerServiceApplicationTests {
 
@@ -53,6 +54,7 @@ public class CustomerServiceApplicationTests {
 
     }
 
+
     @Test
     public void shouldRegisterExistingUser() {
         Customer existingCustomer = customerRepository.save(new Customer(Name.of("Hulk"), Name.of("Hogan")));
@@ -60,8 +62,8 @@ public class CustomerServiceApplicationTests {
 
         webTestClient.post()
                 .uri("/customers/registrations")
-                .header("idToken", "5d438c12-343b-49f2-810d-98d2515fe7be")
-                .contentType(new MediaType("application/vnd.registration.existingcustomer+json;version=1"))
+                .header("idToken", "{key:'5d438c12-343b-49f2-810d-98d2515fe7be', type:'external'}")
+                .contentType(new MediaType("application", "vnd.registration.existingcustomer+json", Collections.singletonMap("version", "1")))
                 .bodyValue(new CustomerRegistrationData(existingCustomer.getId(), existingCustomer.getLastname(), LocalDate.of(1966, Month.JUNE, 6), "50674"))
                 .exchange()
                 .expectStatus().isCreated()

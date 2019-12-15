@@ -107,12 +107,13 @@ public class RegistrationController {
         try {
             customerLink = linkTo(CustomerController.class, externalId).withRel("customer");
             //Link customerLink = linkTo(methodOn(CustomerController.class, "id").getCustomer("id")).withRel("customer");
+            //URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path(customerLink.getHref()).build(Collections.emptyMap());
         } catch (Throwable ex) {
             customerLink = new Link("customers/" + externalId, "customer");
         }
 
-        URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path(customerLink.getHref()).build(Collections.emptyMap());
-        return ResponseEntity.status(HttpStatus.CREATED).location(uri).build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).location(customerLink.toUri()).build();
     }
 
     @ExceptionHandler({InvalidRegistrationDataException.class})

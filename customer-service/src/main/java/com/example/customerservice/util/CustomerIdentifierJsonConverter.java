@@ -16,6 +16,7 @@ public class CustomerIdentifierJsonConverter implements Converter<String, Custom
         try {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+            mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
             return mapper.readValue(source, CustomerIdentifier.class);
         } catch (JsonProcessingException e) {
             throw new ConversionFailedException(TypeDescriptor.forObject(source), TypeDescriptor.valueOf(CustomerIdentifier.class), source, e);
