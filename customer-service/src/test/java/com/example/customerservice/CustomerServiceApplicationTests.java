@@ -44,9 +44,10 @@ public class CustomerServiceApplicationTests {
 
     @Test
     public void shouldSendEvents() throws ExecutionException, InterruptedException {
-        ResponseEntity responseEntity = registrationController.registerExistingCustomer(CustomerIdentifier.from("123456", "extern"),
+        Mono<ResponseEntity> responseEntityMono = registrationController.registerExistingCustomer(CustomerIdentifier.from("123456", "extern"),
                 new CustomerRegistrationData(1L, "Mustermann", LocalDate.of(1980, Month.APRIL, 14), "50674"));
 
+        ResponseEntity responseEntity = responseEntityMono.block(Duration.ofSeconds(5));
         System.out.println("*******************************************");
         System.out.println(responseEntity);
         System.out.println("*******************************************");

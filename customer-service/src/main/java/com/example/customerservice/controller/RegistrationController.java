@@ -5,6 +5,7 @@ import com.example.customerservice.event.EventBus;
 import com.example.customerservice.event.ExistingCustomerRegistrationRequested;
 import com.example.customerservice.exception.CustomerNotFoundException;
 import com.example.customerservice.exception.InvalidRegistrationDataException;
+import com.example.customerservice.hateoas.CustomerLinks;
 import com.example.customerservice.hateoas.CustomerRepresentationModelAssembler;
 import com.example.customerservice.model.dto.CustomerRegistrationData;
 import com.example.customerservice.model.valueobject.CustomerIdentifier;
@@ -18,14 +19,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+
 
 @RestController
 @RequestMapping(path = "/customers/registrations")
@@ -39,6 +39,9 @@ public class RegistrationController {
 
     @Autowired
     private RegistrationService registrationService;
+
+    @Autowired
+    private CustomerLinks customerLinks;
 
     @RequestMapping(method = RequestMethod.HEAD)
     public ResponseEntity isRegistered(@RequestParam final String identifierKey, @RequestParam final String identifierType) {
@@ -57,7 +60,7 @@ public class RegistrationController {
     }
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, "application/vnd.registration.existingcustomer+json;version=1"})
-    public ResponseEntity registerExistingCustomer(@RequestHeader(value = "idToken") final CustomerIdentifier externalCustomerIdentifier,
+    public Mono<ResponseEntity> registerExistingCustomer(@RequestHeader(value = "idToken") final CustomerIdentifier externalCustomerIdentifier,
                                                    @RequestBody final CustomerRegistrationData registrationData) throws ExecutionException, InterruptedException {
         ExistingCustomerRegistrationRequested regRequestedEvent = new ExistingCustomerRegistrationRequested(
                 externalCustomerIdentifier,
@@ -71,28 +74,17 @@ public class RegistrationController {
             responseEntityReference.set(createResponse(event));
         }, 1);
 
+        Mono<ResponseEntity> responseMono = Mono.fromSupplier(() -> {
+            ResponseEntity responseEntity = null;
+            while (responseEntity == null) {
+                responseEntity = responseEntityReference.get();
+            }
+            return responseEntity;
+        });
+
         eventBus.send(regRequestedEvent);
 
-        CompletableFuture<ResponseEntity> responseFuture = CompletableFuture
-                .supplyAsync(() -> {
-                    ResponseEntity responseEntity = null;
-                    while (responseEntity == null) {
-                        responseEntity = responseEntityReference.get();
-                    }
-                    return responseEntity;
-                })
-                .exceptionally(throwable -> {
-                    if (throwable instanceof InvalidRegistrationDataException) {
-                        return handleException((InvalidRegistrationDataException) throwable);
-                    }
-                    if (throwable instanceof CustomerNotFoundException) {
-                        return handleException((CustomerNotFoundException) throwable);
-                    }
-                    return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-                })
-                .completeOnTimeout(new ResponseEntity(HttpStatus.GATEWAY_TIMEOUT), 3, TimeUnit.SECONDS);
-
-        return responseFuture.get();
+        return responseMono;
 
         //wait for registration event
         //TODO how to return HEAD request in HATEOAS?
@@ -106,13 +98,12 @@ public class RegistrationController {
 
 
     private ResponseEntity createResponse(CustomerRegistered customerRegisteredEvent) {
-        String externalId = customerRegisteredEvent.getExternalIdentifier().getKey();
         Link customerLink;
         try {
-            customerLink = linkTo(CustomerController.class, externalId).withRel("customer");
-            //Link customerLink = linkTo(methodOn(CustomerController.class, "id").getCustomer("id")).withRel("customer");
+            customerLink = customerLinks.getCustomerLink(customerRegisteredEvent.getExternalIdentifier());
             //URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path(customerLink.getHref()).build(Collections.emptyMap());
         } catch (Throwable ex) {
+            String externalId = customerRegisteredEvent.getExternalIdentifier().getKey();
             customerLink = new Link("customers/" + externalId, "customer");
         }
 
