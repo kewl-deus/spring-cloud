@@ -5,7 +5,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-rest')
 	compile('org.springframework.boot:spring-boot-starter-hateoas')
 	compile('org.springframework.data:spring-data-rest-hal-browser')
-	compile('org.springframework.boot:spring-boot-starter-webflux')
+	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.cloud:spring-cloud-starter-config')
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
 	compile('org.springframework.cloud:spring-cloud-starter-zipkin')
@@ -15,11 +15,6 @@ dependencies {
 	implementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
 
 	implementation 'org.springframework.hateoas:spring-hateoas:1.0.2.RELEASE'
-
-	//rxjava
-	implementation( "io.reactivex.rxjava2:rxjava:2.1.5")
-	//reactor
-	implementation("io.projectreactor:reactor-tools:3.3.1.RELEASE")
 
 	//lombok
 	annotationProcessor('org.projectlombok:lombok:1.18.10')

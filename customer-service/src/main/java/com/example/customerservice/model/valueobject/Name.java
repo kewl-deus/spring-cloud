@@ -1,10 +1,12 @@
 package com.example.customerservice.model.valueobject;
 
+import lombok.Value;
 import org.springframework.util.Assert;
 
 import javax.persistence.Embeddable;
 import java.util.Objects;
 
+//@Value(staticConstructor = "of")
 @Embeddable
 public class Name {
 

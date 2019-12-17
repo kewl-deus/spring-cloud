@@ -1,8 +1,8 @@
 package com.example.customerservice.event.handler;
 
 import com.example.customerservice.event.CustomerRegistered;
+import com.example.customerservice.event.EventBus;
 import com.example.customerservice.event.RegistrationDataValidated;
-import com.example.customerservice.event.sourcing.EventBus;
 import com.example.customerservice.model.entity.CustomerIndexRecord;
 import com.example.customerservice.service.RegistrationService;
 import org.springframework.stereotype.Component;

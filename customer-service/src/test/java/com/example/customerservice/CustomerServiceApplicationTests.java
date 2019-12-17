@@ -22,6 +22,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collections;
+import java.util.concurrent.ExecutionException;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:application-controller-tests.properties")
@@ -42,11 +43,10 @@ public class CustomerServiceApplicationTests {
     }
 
     @Test
-    public void shouldSendEvents() {
-        Mono<ResponseEntity> responseMono = registrationController.registerExistingCustomer(CustomerIdentifier.from("123456", "extern"),
+    public void shouldSendEvents() throws ExecutionException, InterruptedException {
+        ResponseEntity responseEntity = registrationController.registerExistingCustomer(CustomerIdentifier.from("123456", "extern"),
                 new CustomerRegistrationData(1L, "Mustermann", LocalDate.of(1980, Month.APRIL, 14), "50674"));
 
-        ResponseEntity responseEntity = responseMono.block(Duration.ofSeconds(10));
         System.out.println("*******************************************");
         System.out.println(responseEntity);
         System.out.println("*******************************************");
